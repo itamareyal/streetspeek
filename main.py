@@ -2,8 +2,12 @@
 from global_defs import *
 from global_func import *
 
+import pytesseract
+import PIL.Image
+
+
 # ---------------------------------------------------------
-#   CAFEINFO - execution script
+#   StreetsPeek - execution script
 # ---------------------------------------------------------
 
 # Program version
@@ -15,33 +19,13 @@ current_image = IMG_DEFAULT
 current_folder = os.getcwd()
 initial_filelist = get_img_file_list(current_folder)
 
-# GUI layout
-# layout = [  # header
-#             [sg.Push(), sg.Text('', font=FONT_HEADER), sg.Push()],
-
-#             # image
-#             [sg.Push(), sg.Image(current_image, s=IMG_SIZE, key='-IMG-'), sg.Push(),],
-
-#             # buttons
-#             [sg.Input(key='-FILE-', visible=False, enable_events=True), sg.FileBrowse(button_text= 'Load image', font=FONT_PARAM),
-#             sg.Button('Analyze', key='-ANALYZE-', font=FONT_PARAM),
-#             sg.Button('Exit', key='-EXIT-', font=FONT_PARAM)],
-
-#             # console
-#             [sg.Output(size=(CONSOLE_WIDTH,5), key='-OUTPUT-', font=FONT_LOG)],
-#             ]
-
-
 # --------------------------------- Define Layout ---------------------------------
-
-# First the window layout...2 columns
 
 left_col = [[sg.Image(key='-LOGO-', data=convert_to_bytes(LOGO_FILE, resize=(300,300)))],
             [sg.Text('Folder'), sg.In(size=(25,1), enable_events=True ,key='-FOLDER-'), sg.FolderBrowse(initial_folder=current_folder)],
             [sg.Listbox(values=initial_filelist, enable_events=True, size=(40,20),key='-FILE LIST-')],
             [sg.Text('Resize to',visible=False), sg.In(key='-W-', size=(5,1),visible=False), sg.In(key='-H-', size=(5,1),visible=False)]]
 
-# For now will only show the name of the file that was chosen
 images_col = [
               [sg.Text(size=(40,1), key='-TOUT-')],
               [sg.Image(key='-IMAGE-')]]
@@ -60,6 +44,9 @@ window = sg.Window(f'streetspeek version {version}', layout, element_justificati
 compute_flag= False
 compute_ready = False
 compute_cnt = 0
+
+# Pytesseract
+tes_config = r"--psm 6 --oem 3"
 
 # ----- Run the Event Loop -----
 # --------------------------------- Event Loop ---------------------------------
@@ -92,34 +79,21 @@ while True:
             pass        # something weird happened making the full filename
 
     elif event == '-ANALYZE-':
-        # print('analyzing image...')
-        time.sleep(3)
-        compute_flag = True
-        print('image analyzed')
-        window['-IMAGE-'].update(data=convert_to_bytes(DET_IMG, resize=IN_IMG_SIZE))
-        print('Results for זוריק')
-        print(f'WEBSITE: {DET_WEB}')
-        print(f'FACEBOOK: {DET_FACEBOOK}')
-        print(f'-------------------------------')
-        print('Results for זורך')
-        print('No results found for זורך')
+        img = cv2.imread(filename)
+        height, width, _ = img.shape
+        boxes = pytesseract.image_to_boxes(img, config=tes_config)
+        for box in boxes.splitlines():
+            box = box.split(" ")
+            img = cv2.rectangle(img, (int(box[1]), height- int(box[2])), (int(box[3]), width- int(box[4])), (0,255,0), 2 )
+        cv2.imwrite(filename=f"{filename}_boxed.jpeg", img=img)
+        img_boxed = f"{filename}_boxed.jpeg"
+        tes_text = pytesseract.image_to_string(PIL.Image.open(filename), config=tes_config)
+        
+        # print detected text
+        print(tes_text)
+        
+        # Show Image with boxws
+        window['-IMAGE-'].update(data=convert_to_bytes(img_boxed, resize=IN_IMG_SIZE))
 
 # --------------------------------- Close & Exit ---------------------------------
 window.close()
-
-# # Main event loop
-# while True:
-#     event, values = window.read()
-#     # window closing
-#     if event == sg.WIN_CLOSED or event == '-EXIT-':
-#         break
-
-#     # excel file selected
-#     if event == '-FILE-':
-#         if verify_input_file(values['-FILE-']):
-#             current_image = values['-FILE-']
-#             window['-IMG-'].update(source=current_image)
-#             print(f"new image loaded")
-
-
-# window.close()

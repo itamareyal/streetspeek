@@ -6,6 +6,7 @@ import os.path
 import PIL.Image
 import io
 import base64
+import cv2
 
 # ---------------------------------------------------------
 #   GOLBAL_FUNC - function library
@@ -63,3 +64,12 @@ def convert_to_bytes(file_or_bytes, resize=None):
     img.save(bio, format="PNG")
     del img
     return bio.getvalue()
+
+def resize_image(img, scale_percent) :
+    # Calculate new size
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+    # Resize image
+    resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+    return resized

@@ -1,0 +1,8 @@
+# Streetspeek requirements file
+numpy
+opencv-python
+packaging
+Pillow
+PySimpleGUI
+pytesseract
+setuptools
