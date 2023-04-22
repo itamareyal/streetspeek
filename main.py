@@ -46,7 +46,7 @@ compute_ready = False
 compute_cnt = 0
 
 # Pytesseract
-tes_config = r"--psm 6 --oem 3"
+tes_config = r"--psm 11 --oem 3"
 
 # ----- Run the Event Loop -----
 # --------------------------------- Event Loop ---------------------------------
@@ -84,13 +84,14 @@ while True:
         boxes = pytesseract.image_to_boxes(img, config=tes_config)
         for box in boxes.splitlines():
             box = box.split(" ")
-            img = cv2.rectangle(img, (int(box[1]), height- int(box[2])), (int(box[3]), width- int(box[4])), (0,255,0), 2 )
+            img = cv2.rectangle(img, (int(box[1]), height- int(box[2])), (int(box[3]), height- int(box[4])), (0,255,0), 2 )
         cv2.imwrite(filename=f"{filename}_boxed.jpeg", img=img)
         img_boxed = f"{filename}_boxed.jpeg"
         tes_text = pytesseract.image_to_string(PIL.Image.open(filename), config=tes_config)
         
         # print detected text
         print(tes_text)
+        print(BUFFER)
         
         # Show Image with boxws
         window['-IMAGE-'].update(data=convert_to_bytes(img_boxed, resize=IN_IMG_SIZE))

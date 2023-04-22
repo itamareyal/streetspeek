@@ -32,6 +32,8 @@ CONSOLE_WIDTH = 100
 
 MAX_COMPUTE_CNT = 1000
 
+BUFFER = '----------------------------------------'
+
 DET_IMG = os.path.join('db', 'det.jpeg')
 DET_WEB = 'https://www.cafezorik.co.il/'
 DET_FACEBOOK = 'https://www.facebook.com/cafezorik/'
