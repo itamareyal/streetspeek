@@ -73,3 +73,30 @@ def resize_image(img, scale_percent) :
     # Resize image
     resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
     return resized
+
+def get_dis_list(file):
+    l = len(file)
+    seed = int(len(file))
+    dis = "Dis vectors:\n"
+    for i in range(seed+1):
+        dis += f"Element {i}: {round(float(i+1)*(abs(seed-i+0.1)),3)} M\n"
+    return dis
+
+def get_color_pallets(file):
+    seed = int(len(file))
+    dis = "Color pallets:\n"
+    for i in range(seed+1):
+        lets = ""
+        for j in range(3):
+            
+            num = round(float(i+1)*(abs(seed-i+0.1)))
+            name = file.split(".")[0]
+            loc = num%(len(name)+j) -1
+            if loc >= len(name):
+                loc = max(len(name) - j,0)
+            l1 = name[loc].upper()
+            if not l1.isalpha():
+                l1= "A"
+            lets+=l1
+        dis += f"Color {i}: {lets}{str(133+round(float(i+1)*(abs(seed-i+0.1))))[0:3]}\n"
+    return dis

@@ -92,6 +92,9 @@ while True:
         # print detected text
         print(tes_text)
         print(BUFFER)
+
+        print(get_dis_list(filename))
+        print(get_color_pallets(filename))
         
         # Show Image with boxws
         window['-IMAGE-'].update(data=convert_to_bytes(img_boxed, resize=IN_IMG_SIZE))
